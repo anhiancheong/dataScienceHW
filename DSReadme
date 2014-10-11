@@ -1,0 +1,19 @@
+
+Andrew Hian-Cheong
+Here are a few notes about making my code work
+
+-For the sake of efficiency when testing, I have commented out the steps that aquire information on schools in MD and VA. You may see in the main function where these steps would occur
+
+- *** You will need a new api key to test the code;the key is linked to the source IP address. You can visit (http://www.education.com/schoolfinder/tools/webservice/) to create a new key.You may overwrite the global key variable at the beginning of the script for it to take effect
+
+- Database: The program assumes an hbase instance running on the current machine at the defualt port as well as the built in REST api server for the hbase. Here are the following commands to set this us:
+
+$HADOOP_PATH/bin/start_hbase.sh //creates instance of hbase DB
+$HADOOP_PATH/bin/hbase-daemon.sh start rest -p 8000 //starts Rest API server
+
+- I use a library called starbase to interact with the hbase instance. It is just a wrapper around the hbase rest api. This package can be installed with pip as can all other packages (http://blog.cloudera.com/blog/2013/10/hello-starbase-a-python-wrapper-for-the-hbase-rest-api/)
+
+- The load finance data method requires the file "schoolFinanceDC.csv" to be in the same directory as the script.
+
+*I apologize in advance for the shoddy code; had I a bit more time, I would have refined it a bit more.
+*I am working on getting pig scripts to work. Progress on going

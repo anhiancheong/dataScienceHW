@@ -1,0 +1,3 @@
+Table: schools16Number of schools: 320Total attributes collected: 11928
+Total Invalid attributes: 1113
+Percentage invalid: 9.33098591549% 
