@@ -1,3 +1,35 @@
-Table: schools16Number of schools: 320Total attributes collected: 11928
+Table: schools16Number of schools: 320Total attributes collected: 12800
 Total Invalid attributes: 1113
-Percentage invalid: 9.33098591549% 
+Percentage invalid: 8.6953125% 
+Attribute: stats:enrollment  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: addr:latitude  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: stats:enrollmentGroupBin  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: addr:zip  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: stats:Black_percent  : 
+Total attribute count: 307
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: stats:s_t_ratio  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: addr:schoolname  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 
+Attribute: addr:longitude  : 
+Total attribute count: 320
+Total attribute error count: 0
+Percentage: 0.0 % 

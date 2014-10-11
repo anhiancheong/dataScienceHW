@@ -233,6 +233,12 @@ def measureCleanliness():
   schoolsTable = dbConn.table(tableName)
   globalAttributeErrorCount = 0
   globalAttributeTotalCount = 0
+
+  #TEST
+  with open("schoolIds.txt") as f:
+    idList = f.read().splitlines()
+
+  selectedAttributes = {"stats:enrollment":{"error":0, "total":0}, "stats:s_t_ratio":{"error":0, "total":0}, "addr:longitude":{"error":0, "total":0}, "addr:latitude":{"error":0, "total":0}, "addr:zip":{"error":0, "total":0}, "stats:enrollmentGroupBin":{"error":0, "total":0}, "addr:schoolname":{"error":0, "total":0}, "stats:Black_percent":{"error":0, "total":0}}
   for schoolIdIndex in range(0, len(idList)):
     tableData = schoolsTable.fetch(idList[schoolIdIndex])
     if tableData == None:
@@ -242,10 +248,15 @@ def measureCleanliness():
     for col in tableData:
       for subCol in tableData[col]:
         debugPrint(str(subCol) + " : " + str(tableData[col][subCol]))
+        combinedColumnStr = str(col) + ":" + str(subCol) 
         if tableData[col][subCol] == '' or tableData[col][subCol] == None or tableData[col][subCol] == "None":
           globalAttributeErrorCount += 1
-        
+          if combinedColumnStr in selectedAttributes:
+            selectedAttributes[combinedColumnStr]["error"] += 1
+
         globalAttributeTotalCount += 1
+        if combinedColumnStr in selectedAttributes:
+            selectedAttributes[combinedColumnStr]["total"] += 1
 
   fileWriter = open("cleanStats.txt", "w+")
   fileWriter.write("Table: " + tableName)
@@ -253,6 +264,11 @@ def measureCleanliness():
   fileWriter.write("Total attributes collected: " + str(globalAttributeTotalCount) + "\n")
   fileWriter.write("Total Invalid attributes: " + str(globalAttributeErrorCount)+ "\n")
   fileWriter.write("Percentage invalid: " + str(((float(globalAttributeErrorCount)/float(globalAttributeTotalCount)) * 100)) + "% \n")  
+  for attr in selectedAttributes:
+    fileWriter.write("Attribute: " + str(attr) + "  : \n")
+    fileWriter.write("Total attribute count: " + str(selectedAttributes[attr]["total"]) + "\n")
+    fileWriter.write("Total attribute error count: " + str(selectedAttributes[attr]["error"]) + "\n")
+    fileWriter.write("Percentage: " + str((float(selectedAttributes[attr]["error"])/float(selectedAttributes[attr]["total"])) * 100) + " % \n")
   return
 
 #function to write out the school id numbers of each school queried
@@ -378,10 +394,11 @@ def loadFinanceDataToDB(financeFile):
         schoolTable.insert(schoolID, insertKVPair)   
   return
 
-makeAPICall("schoolSearch", "state=DC&")
+#makeAPICall("schoolSearch", "state=DC&")
 #makeAPICall("schoolSearch", "state=MD&")
 #makeAPICall("schoolSearch", "state=VA&")
+
+#outputIDLists()
+#calculateBinning()
+#loadFinanceDataToDB("schoolFinanceDC.csv")
 measureCleanliness()
-outputIDLists()
-calculateBinning()
-loadFinanceDataToDB("schoolFinanceDC.csv")
