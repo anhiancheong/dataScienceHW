@@ -394,11 +394,14 @@ def loadFinanceDataToDB(financeFile):
         schoolTable.insert(schoolID, insertKVPair)   
   return
 
-#makeAPICall("schoolSearch", "state=DC&")
+
+# MAIN SCRIPT - ALL CODE LAUNCHES FROM HERE
+
+makeAPICall("schoolSearch", "state=DC&")
 #makeAPICall("schoolSearch", "state=MD&")
 #makeAPICall("schoolSearch", "state=VA&")
 
-#outputIDLists()
-#calculateBinning()
-#loadFinanceDataToDB("schoolFinanceDC.csv")
+outputIDLists()
+calculateBinning()
+loadFinanceDataToDB("schoolFinanceDC.csv")
 measureCleanliness()
