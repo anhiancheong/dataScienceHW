@@ -3,7 +3,7 @@ import pprint
 import json
 import csv
 from starbase import Connection
-# GLOBALS
+#"localhost",8001# GLOBALS
 #old key
 #key = "a79efc9741696b8e159b8c3adb3a1719"
 
@@ -13,12 +13,15 @@ from starbase import Connection
 #141.161.133.172 - TA room
 #key = "7a561bdd96a7f251eab07ae1eb90cc49"
 
+#141.161.133.97 - TA room
+key = "afa10f43e1ac15b633b8192f93316902"
+
 #API Key for education API
 #The key is associated with my home ip address key
 #This is a very stupid way of doing client auth
 #To test this code, you will need to provide your own
 #API key from api.education.com
-key = "141a9146b994a54b1c5bce195c17845d"
+#key = "141a9146b994a54b1c5bce195c17845d"
 
 #This dictionary maps fields from the json response
 #of the education.com api, to columns in my hbase
@@ -56,7 +59,7 @@ jsonToDBMapping = {
 #that program will use
 #NOTE: If the table is not present in the hbase database,
 #this script WILL create it :)
-tableName = "schools16"
+tableName = "schools19"
 
 #List of nces_ids of the schools requested
 #This is used to output to a text file
@@ -85,36 +88,45 @@ def makeAPICall(apiFunction, apiParameters):
   #Format the url call
   url = "http://api.education.com/service/service.php?f=" + apiFunction
   url = url + "&key="+key+"&sn=sf&v=4&" + apiParameters + "&Resf=json"
+  debugPrint("Launching api");
   #Request the data and turn it into json form
   apiResponse = requests.get(url)
   jsonData = apiResponse.json()
+  #debugPrint(jsonData)
   #Iterate through all metadata school objects in the json
   for school in jsonData:
     if school == 'faultCode' or school == 'faultString' or school == 'faultType':
+      #debugPrint("Fault encountered")
       continue
     else:
       #special handling if makeAPICall is being used to search for schools
       if apiFunction == "schoolSearch":
+        #debugPrint("Found a school")
         schoolData = school["school"]
         postSchoolToDB(schoolData)
+  #debugPrint("Done with api")
   return jsonData
 
 #Function that will setup the proper columns in the hbase database
-#@param hbase database connection through starbase package
+#@param hbase database connection "localhost",8001through starbase package
 def setupDB(conn):
   #this command will create a table in hbase if it 
   #does not already exist once column families are added
+  debugPrint("Setup Table")
+  #print conn
   schoolTable = conn.table(tableName)
-  debugPrint("Does table exist? " + str(schoolTable.exists()))
+  #print "Does table exist? " + str(schoolTable.exists())
+  
 
   if not schoolTable.exists():
+    print "Table does not exist; will create table: " + tableName
     schoolTable.create('addr')
 
   columnFamilies = schoolTable.columns()
   requiredColumns = ["addr", "web", "stats", "apiid", "tests"]
   for col in requiredColumns:
     if not col in columnFamilies:
-      debugPrint("Adding column: " + str(col))
+      print "Adding column: " + str(col)
       schoolTable.add_columns(col)
 
 #This function will always come after posting to the databse
@@ -142,7 +154,7 @@ def postDiversityToDB(nces_id):
           diversityInsertList["stats:" + name + "_percent"] = percentage
           diversityInsertList["stats:" + name + "_total"] = total
 
-  dbConn = Connection()
+  dbConn = Connection("localhost",8001)
   schoolTable = dbConn.table(tableName)
   schoolTable.insert(nces_id, diversityInsertList)
 
@@ -157,11 +169,11 @@ def postSchoolToDB(school):
   if "private" in school['schooltype']:
     return
 
-  #default connection is to 127.0.0.1:8085,
+  #default connection "localhost",8001is to 127.0.0.1:8085,
   #other hostnames and port can be specified as
-  # Connection(<hostname>,<port>)
-  dbConn = Connection()
-
+  # Connection("localhost",8001<hostname>,<port>)
+  dbConn = Connection("localhost",8001)
+  
   #Check if proper tables are setup
   #If not, call setup method
   setupDB(dbConn)
@@ -214,7 +226,7 @@ def postTestScoresToDB(nces_id):
         dbTestScoreList["tests:" + subject] = percentage
         debugPrint("Found score for " + nces_id + " : " + subject + " -- percent: " + str(percentage))   
 
-  dbConn = Connection()
+  dbConn = Connection("localhost",8001)
   schoolTable = dbConn.table(tableName)
   schoolTable.insert(nces_id, dbTestScoreList)
 
@@ -229,7 +241,7 @@ def measureCleanliness():
   #attributes over the number of all schools
   #I track these numbers using global variables and then calculate them across the data
   #set in this functions
-  dbConn = Connection()
+  dbConn = Connection("localhost",8001)
   schoolsTable = dbConn.table(tableName)
   globalAttributeErrorCount = 0
   globalAttributeTotalCount = 0
@@ -291,7 +303,7 @@ def calculateBinning():
   #hence I use the auxiliary file I create earilier and query the database one
   #row at a time - this slow speed is liekly related to the development computer
   fileReader = open("schoolIds.txt", "r+")
-  dbConn = Connection()
+  dbConn = Connection("localhost",8001)
   schoolTable = dbConn.table(tableName)
   enrollmentList = []
   for schoolId in fileReader:
@@ -354,7 +366,7 @@ def makeUniversityCall():
 #on teachers for DC public schools
 #param financeFile - path to csv file of finance information
 def loadFinanceDataToDB(financeFile):
-  dbConn = Connection()
+  dbConn = Connection("localhost",8001)
   schoolTable = dbConn.table(tableName)
   with open(financeFile, "rb") as csvFile:
     financeReader = csv.reader(csvFile)
